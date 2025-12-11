@@ -7,14 +7,16 @@ import jakarta.persistence.*;
 public class Country {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long        id;
-    @Column(name = "ctry_name", nullable = false)
+    private Long        id;
+    @Column(nullable = false)
     private String      name;
-    @Column(name = "ctry_code", nullable = false, length = 3)
+    @Column(nullable = false, length = 3)
     private String      code;
 
-    public Country(long id, String name, String code) {
-        this.id = id;
+    public Country() {
+    }
+
+    public Country(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -31,12 +33,11 @@ public class Country {
         return code;
     }
 
-    @Override
-    public String toString() {
-        return "Country{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                '}';
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

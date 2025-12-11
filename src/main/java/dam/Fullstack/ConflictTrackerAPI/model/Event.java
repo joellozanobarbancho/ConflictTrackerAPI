@@ -3,36 +3,29 @@ package dam.Fullstack.ConflictTrackerAPI.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 @Entity
 @Table(name = "events")
 public class Event {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long        id;
-    @Column(name = "event_date")
+    private Long        id;
+    @Column(nullable = false)
     private LocalDate   eventDate;
-    @Column(name = "event_location")
+    @Column(nullable = false)
     private String      location;
-    @Column(name = "event_description")
+    @Column(nullable = false)
     private String      description;
 
     //relation many to one Conflict
-    @OneToMany(
-            mappedBy = "conflict",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    ArrayList<Conflict> conflicts;
-    public void addConflict(Conflict conflict) {
-        conflicts.add(conflict);
-//      conflicts.setEvent(this);
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "conflict_id")
+    private Conflict conflict;
+
+    public Event() {
     }
 
-    public Event(long id, LocalDate eventDate, String location, String description) {
-        this.id = id;
+    public Event(LocalDate eventDate, String location, String description) {
         this.eventDate = eventDate;
         this.location = location;
         this.description = description;
@@ -54,18 +47,23 @@ public class Event {
         return description;
     }
 
-    public ArrayList<Conflict> getConflicts() {
-        return conflicts;
+    public Conflict getConflict() {
+        return conflict;
     }
 
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", eventDate=" + eventDate +
-                ", location='" + location + '\'' +
-                ", description='" + description + '\'' +
-                ", conflicts=" + conflicts +
-                '}';
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setConflict(Conflict conflict) {
+        this.conflict = conflict;
     }
 }
