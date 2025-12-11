@@ -1,5 +1,6 @@
 package dam.Fullstack.ConflictTrackerAPI.model;
 
+import dam.Fullstack.ConflictTrackerAPI.service.ConflictService;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ public class Conflict {
     private String      name;
     @Column(name = "city_date")
     private LocalDate   startDate;
+    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    private ConflictStatus status;
     @Column(name = "city_description")
     private String      description;
 
@@ -29,9 +32,10 @@ public class Conflict {
     public Conflict() {
     }
 
-    public Conflict(String name, LocalDate startDate, String description) {
+    public Conflict(String name, LocalDate startDate, ConflictStatus status, String description) {
         this.name = name;
         this.startDate = startDate;
+        this.status = status;
         this.description = description;
     }
 
@@ -45,6 +49,10 @@ public class Conflict {
 
     public LocalDate getStartDate() {
         return startDate;
+    }
+
+    public ConflictStatus getStatus() {
+        return status;
     }
 
     public String getDescription() {
@@ -61,6 +69,10 @@ public class Conflict {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public void setStatus(ConflictStatus status) {
+        this.status = status;
     }
 
     public void setDescription(String description) {
