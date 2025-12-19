@@ -19,6 +19,7 @@ Permite probar la API sin necesidad de insertar datos manualmente.
 3. Abrir interfaz web        → http://localhost:8080/index.html
 
 Para acceder a la consola H2 → http://localhost:8080/h2-console
+
 JDBC URL:  jdbc:h2:mem:conflictdb
 User:      sa
 Password:  (vacío)
