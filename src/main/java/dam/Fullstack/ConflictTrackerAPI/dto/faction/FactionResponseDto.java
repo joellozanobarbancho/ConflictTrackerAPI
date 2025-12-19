@@ -1,8 +1,9 @@
-package dam.Fullstack.ConflictTrackerAPI.dto;
+package dam.Fullstack.ConflictTrackerAPI.dto.faction;
 
 import java.util.List;
 
-public record FactionDto(
+public record FactionResponseDto(
+        Long id,
         String name,
         Long conflictId,
         List<String> supporterCountryCodes

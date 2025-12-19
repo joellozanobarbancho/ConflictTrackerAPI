@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Conflict Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #eee;
+        }
+        .code-list {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Lista de Conflictos</h1>
+
+<table id="conflictsTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Fecha Inicio</th>
+        <th>Estado</th>
+        <th>Descripción</th>
+        <th>Países</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    fetch("/api/v1/conflicts")
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector("#conflictsTable tbody");
+
+            data.forEach(conflict => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${conflict.id}</td>
+                    <td>${conflict.name}</td>
+                    <td>${conflict.startDate ?? "-"}</td>
+                    <td>${conflict.status}</td>
+                    <td>${conflict.description ?? "-"}</td>
+                    <td class="code-list">${conflict.countryCodes.join(", ")}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => console.error("Error cargando conflictos:", err));
+</script>
+
+</body>
+</html>

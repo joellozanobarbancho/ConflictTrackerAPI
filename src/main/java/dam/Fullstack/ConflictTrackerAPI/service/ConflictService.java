@@ -46,7 +46,3 @@ public class ConflictService {
 
     public void delete(Long id) { conflictRepo.deleteById(id); }
 }
-
-class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) { super(message); }
-}
