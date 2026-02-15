@@ -55,6 +55,8 @@ Permite probar la API sin necesidad de insertar datos manualmente.
         "supporterCountryCodes": ["ESP", "FRA"]
   }'
 
+## 🌐 Acceder a la interfaz web:
+**http://localhost:8080/web/conflicts**
 
 
 

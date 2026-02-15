@@ -47,14 +47,14 @@ public class ConflictService {
 
     public ConflictDTO createConflict(ConflictCreateDTO createDTO) {
         Conflict conflict = new Conflict();
-        conflict.setName(createDTO.name());
-        conflict.setStartDate(createDTO.startDate());
-        conflict.setStatus(createDTO.status());
-        conflict.setDescription(createDTO.description());
+        conflict.setName(createDTO.getName());
+        conflict.setStartDate(createDTO.getStartDate());
+        conflict.setStatus(createDTO.getStatus());
+        conflict.setDescription(createDTO.getDescription());
 
-        if (createDTO.countryCodes() != null && !createDTO.countryCodes().isEmpty()) {
+        if (createDTO.getCountryCodes() != null && !createDTO.getCountryCodes().isEmpty()) {
             Set<Country> countries = new HashSet<>();
-            for (String code : createDTO.countryCodes()) {
+            for (String code : createDTO.getCountryCodes()) {
                 Country country = countryRepository.findByCode(code)
                         .orElseThrow(() -> new NotFoundException
 ("Country not found with code: " + code));
@@ -72,14 +72,14 @@ public class ConflictService {
                 .orElseThrow(() -> new NotFoundException
 ("Conflict not found with id: " + id));
 
-        conflict.setName(updateDTO.name());
-        conflict.setStartDate(updateDTO.startDate());
-        conflict.setStatus(updateDTO.status());
-        conflict.setDescription(updateDTO.description());
+        conflict.setName(updateDTO.getName());
+        conflict.setStartDate(updateDTO.getStartDate());
+        conflict.setStatus(updateDTO.getStatus());
+        conflict.setDescription(updateDTO.getDescription());
 
-        if (updateDTO.countryCodes() != null) {
+        if (updateDTO.getCountryCodes() != null) {
             Set<Country> countries = new HashSet<>();
-            for (String code : updateDTO.countryCodes()) {
+            for (String code : updateDTO.getCountryCodes()) {
                 Country country = countryRepository.findByCode(code)
                         .orElseThrow(() -> new NotFoundException
 ("Country not found with code: " + code));
