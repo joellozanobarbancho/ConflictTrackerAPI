@@ -14,17 +14,17 @@ public class Faction {
     @Column(nullable = false)
     private String      name;
 
-    //relations many to many conflict
-    //relations many to many country
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "conflict_id")
-    private Conflict  conflict;
+    private Conflict conflict;
 
     @ManyToMany
-    @JoinTable(name = "faction_countries",
+    @JoinTable(
+            name = "faction_countries",
             joinColumns = @JoinColumn(name = "faction_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id")
-    ) private Set<Country> countries = new HashSet<>();
+    )
+    private Set<Country> supportingCountries = new HashSet<>();
 
     public Faction() {
     }
@@ -34,27 +34,35 @@ public class Faction {
         this.conflict = conflict;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public Conflict getConflict() {
-        return conflict;
-    }
-
-    public Set<Country> getCountries() {
-        return countries;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
+    public Conflict getConflict() {
+        return conflict;
+    }
+
     public void setConflict(Conflict conflict) {
         this.conflict = conflict;
+    }
+
+    public Set<Country> getSupportingCountries() {
+        return supportingCountries;
+    }
+
+    public void setSupportingCountries(Set<Country> supportingCountries) {
+        this.supportingCountries = supportingCountries;
     }
 }

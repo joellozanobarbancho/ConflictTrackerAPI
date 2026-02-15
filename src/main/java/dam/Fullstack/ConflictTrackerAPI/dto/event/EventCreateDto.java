@@ -2,7 +2,7 @@ package dam.Fullstack.ConflictTrackerAPI.dto.event;
 
 import java.time.LocalDate;
 
-public record EventCreateDto(
+public record EventCreateDTO(
         LocalDate eventDate,
         String location,
         String description,

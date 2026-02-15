@@ -25,10 +25,11 @@ public class Event {
     public Event() {
     }
 
-    public Event(LocalDate eventDate, String location, String description) {
+    public Event(LocalDate eventDate, String location, String description, Conflict conflict) {
         this.eventDate = eventDate;
         this.location = location;
         this.description = description;
+        this.conflict = conflict;
     }
 
     public long getId() {

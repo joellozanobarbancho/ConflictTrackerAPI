@@ -2,10 +2,11 @@ package dam.Fullstack.ConflictTrackerAPI.dto.event;
 
 import java.time.LocalDate;
 
-public record EventResponseDto(
+public record EventDTO(
         Long id,
         LocalDate eventDate,
         String location,
         String description,
-        Long conflictId
+        Long conflictId,
+        String conflictName
 ) {}

@@ -1,9 +1,9 @@
 package dam.Fullstack.ConflictTrackerAPI.controller;
 
 import dam.Fullstack.ConflictTrackerAPI.dto.event.*;
-import dam.Fullstack.ConflictTrackerAPI.mapper.EventMapper;
 import dam.Fullstack.ConflictTrackerAPI.model.Event;
 import dam.Fullstack.ConflictTrackerAPI.service.EventService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,68 +13,47 @@ import java.util.List;
 @RequestMapping("/api/v1/events")
 public class EventController {
 
-    private final EventService service;
-    private final EventMapper mapper;
+    private final EventService eventService;
 
-    public EventController(EventService service, EventMapper mapper) {
-        this.service = service;
-        this.mapper = mapper;
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
     }
 
     @GetMapping
-    public List<EventResponseDto> list() {
-        return service.findAll().stream()
-                .map(event -> new EventResponseDto(
-                        event.getId(),
-                        event.getEventDate(),
-                        event.getLocation(),
-                        event.getDescription(),
-                        event.getConflict().getId()
-                ))
-                .toList();
+    public ResponseEntity<List<EventDTO>> getAllEvents(
+            @RequestParam(required = false) Long conflictId) {
+        List<EventDTO> events;
+        if (conflictId != null) {
+            events = eventService.getEventsByConflictId(conflictId);
+        } else {
+            events = eventService.getAllEvents();
+        }
+        return ResponseEntity.ok(events);
     }
 
     @GetMapping("/{id}")
-    public EventResponseDto get(@PathVariable Long id) {
-        Event event = service.findById(id);
-        return new EventResponseDto(
-                event.getId(),
-                event.getEventDate(),
-                event.getLocation(),
-                event.getDescription(),
-                event.getConflict().getId()
-        );
+    public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
+        EventDTO event = eventService.getEventById(id);
+        return ResponseEntity.ok(event);
     }
 
     @PostMapping
-    public EventResponseDto create(@RequestBody EventCreateDto dto) {
-        Event event = mapper.toEntity(dto);
-        Event saved = service.create(event, dto.conflictId());
-        return new EventResponseDto(
-                saved.getId(),
-                saved.getEventDate(),
-                saved.getLocation(),
-                saved.getDescription(),
-                saved.getConflict().getId()
-        );
+    public ResponseEntity<EventDTO> createEvent(@RequestBody EventCreateDTO createDTO) {
+        EventDTO created = eventService.createEvent(createDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public EventResponseDto update(@PathVariable Long id, @RequestBody EventUpdateDto dto) {
-        Event event = mapper.toEntity(dto);
-        Event updated = service.update(id, event, dto.conflictId());
-        return new EventResponseDto(
-                updated.getId(),
-                updated.getEventDate(),
-                updated.getLocation(),
-                updated.getDescription(),
-                updated.getConflict().getId()
-        );
+    public ResponseEntity<EventDTO> updateEvent(
+            @PathVariable Long id,
+            @RequestBody EventCreateDTO updateDTO) {
+        EventDTO updated = eventService.updateEvent(id, updateDTO);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,10 +1,11 @@
 package dam.Fullstack.ConflictTrackerAPI.model;
 
-import dam.Fullstack.ConflictTrackerAPI.service.ConflictService;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,6 +29,12 @@ public class Conflict {
             joinColumns = @JoinColumn(name = "conflict_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id")
     ) private Set<Country> countries = new  HashSet<>();
+
+    @OneToMany(mappedBy = "conflict", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Faction> factions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "conflict", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Event> events = new ArrayList<>();
 
     public Conflict() {
     }
@@ -77,5 +84,17 @@ public class Conflict {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setCountries(Set<Country> countries) {
+        this.countries = countries;
+    }
+
+    public List<Faction> getFactions() {
+        return factions;
+    }
+
+    public List<Event> getEvents() {
+        return events;
     }
 }

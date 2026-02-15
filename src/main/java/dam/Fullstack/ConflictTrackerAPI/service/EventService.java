@@ -1,5 +1,6 @@
 package dam.Fullstack.ConflictTrackerAPI.service;
 
+import dam.Fullstack.ConflictTrackerAPI.dto.event.*;
 import dam.Fullstack.ConflictTrackerAPI.model.Conflict;
 import dam.Fullstack.ConflictTrackerAPI.model.Event;
 import dam.Fullstack.ConflictTrackerAPI.repository.ConflictRepository;
@@ -8,53 +9,83 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class EventService {
 
-    private final EventRepository eventRepo;
-    private final ConflictRepository conflictRepo;
+    private final EventRepository eventRepository;
+    private final ConflictRepository conflictRepository;
 
-    public EventService(EventRepository eventRepo, ConflictRepository conflictRepo) {
-        this.eventRepo = eventRepo;
-        this.conflictRepo = conflictRepo;
+    public EventService(EventRepository eventRepository, ConflictRepository conflictRepository) {
+        this.eventRepository = eventRepository;
+        this.conflictRepository = conflictRepository;
     }
 
-    public List<Event> findAll() {
-        return eventRepo.findAll();
+    public List<EventDTO> getAllEvents() {
+        return eventRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Event findById(Long id) {
-        return eventRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Event %d not found".formatted(id)));
+    public EventDTO getEventById(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found with id: " + id));
+        return toDTO(event);
     }
 
-    public Event create(Event event, Long conflictId) {
-        Conflict conflict = conflictRepo.findById(conflictId)
-                .orElseThrow(() -> new NotFoundException("Conflict %d not found".formatted(conflictId)));
+    public List<EventDTO> getEventsByConflictId(Long conflictId) {
+        return eventRepository.findByConflictIdOrderByEventDateDesc(conflictId).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
+    public EventDTO createEvent(EventCreateDTO createDTO) {
+        Conflict conflict = conflictRepository.findById(createDTO.conflictId())
+                .orElseThrow(() -> new NotFoundException("Conflict not found with id: " + createDTO.conflictId()));
+
+        Event event = new Event();
+        event.setEventDate(createDTO.eventDate());
+        event.setLocation(createDTO.location());
+        event.setDescription(createDTO.description());
         event.setConflict(conflict);
-        return eventRepo.save(event);
+
+        Event saved = eventRepository.save(event);
+        return toDTO(saved);
     }
 
-    public Event update(Long id, Event updated, Long conflictId) {
-        Event existing = findById(id);
+    public EventDTO updateEvent(Long id, EventCreateDTO updateDTO) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found with id: " + id));
 
-        existing.setEventDate(updated.getEventDate());
-        existing.setLocation(updated.getLocation());
-        existing.setDescription(updated.getDescription());
+        Conflict conflict = conflictRepository.findById(updateDTO.conflictId())
+                .orElseThrow(() -> new NotFoundException("Conflict not found with id: " + updateDTO.conflictId()));
 
-        if (conflictId != null) {
-            Conflict conflict = conflictRepo.findById(conflictId)
-                    .orElseThrow(() -> new NotFoundException("Conflict %d not found".formatted(conflictId)));
-            existing.setConflict(conflict);
+        event.setEventDate(updateDTO.eventDate());
+        event.setLocation(updateDTO.location());
+        event.setDescription(updateDTO.description());
+        event.setConflict(conflict);
+
+        Event saved = eventRepository.save(event);
+        return toDTO(saved);
+    }
+
+    public void deleteEvent(Long id) {
+        if (!eventRepository.existsById(id)) {
+            throw new NotFoundException("Event not found with id: " + id);
         }
-
-        return existing;
+        eventRepository.deleteById(id);
     }
 
-    public void delete(Long id) {
-        eventRepo.deleteById(id);
+    private EventDTO toDTO(Event event) {
+        return new EventDTO(
+                event.getId(),
+                event.getEventDate(),
+                event.getLocation(),
+                event.getDescription(),
+                event.getConflict().getId(),
+                event.getConflict().getName()
+        );
     }
 }

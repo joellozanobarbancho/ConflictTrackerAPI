@@ -1,6 +1,6 @@
 package dam.Fullstack.ConflictTrackerAPI.dto.country;
 
-public record CountryCreateDto(
+public record CountryCreateDTO(
         String name,
         String code
 ) {}

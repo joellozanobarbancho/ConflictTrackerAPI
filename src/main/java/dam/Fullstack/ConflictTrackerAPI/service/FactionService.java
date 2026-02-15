@@ -1,5 +1,6 @@
 package dam.Fullstack.ConflictTrackerAPI.service;
 
+import dam.Fullstack.ConflictTrackerAPI.dto.faction.*;
 import dam.Fullstack.ConflictTrackerAPI.model.Conflict;
 import dam.Fullstack.ConflictTrackerAPI.model.Country;
 import dam.Fullstack.ConflictTrackerAPI.model.Faction;
@@ -9,63 +10,116 @@ import dam.Fullstack.ConflictTrackerAPI.repository.FactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class FactionService {
 
-    private final FactionRepository factionRepo;
-    private final ConflictRepository conflictRepo;
-    private final CountryRepository countryRepo;
+    private final FactionRepository factionRepository;
+    private final ConflictRepository conflictRepository;
+    private final CountryRepository countryRepository;
 
-    public FactionService(FactionRepository factionRepo, ConflictRepository conflictRepo, CountryRepository countryRepo) {
-        this.factionRepo = factionRepo;
-        this.conflictRepo = conflictRepo;
-        this.countryRepo = countryRepo;
+    public FactionService(FactionRepository factionRepository,
+                          ConflictRepository conflictRepository,
+                          CountryRepository countryRepository) {
+        this.factionRepository = factionRepository;
+        this.conflictRepository = conflictRepository;
+        this.countryRepository = countryRepository;
     }
 
-    public List<Faction> findAll() {
-        return factionRepo.findAll();
+    public List<FactionDTO> getAllFactions() {
+        return factionRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Faction findById(Long id) {
-        return factionRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Faction %d not found".formatted(id)));
+    public FactionDTO getFactionById(Long id) {
+        Faction faction = factionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException
+("Faction not found with id: " + id));
+        return toDTO(faction);
     }
 
-    public Faction create(Faction faction, Long conflictId, List<String> supporterCodes) {
-        Conflict conflict = conflictRepo.findById(conflictId)
-                .orElseThrow(() -> new NotFoundException("Conflict %d not found".formatted(conflictId)));
+    public List<FactionDTO> getFactionsByConflictId(Long conflictId) {
+        return factionRepository.findByConflictId(conflictId).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
+    public FactionDTO createFaction(FactionCreateDTO createDTO) {
+        Conflict conflict = conflictRepository.findById(createDTO.conflictId())
+                .orElseThrow(() -> new NotFoundException
+("Conflict not found with id: " + createDTO.conflictId()));
+
+        Faction faction = new Faction();
+        faction.setName(createDTO.name());
         faction.setConflict(conflict);
 
-        faction.getCountries().clear();
-        for (String code : supporterCodes) {
-            Country c = countryRepo.findByCode(code)
-                    .orElseThrow(() -> new NotFoundException("Country %s not found".formatted(code)));
-            faction.getCountries().add(c);
+        if (createDTO.supporterCountryCodes() != null && !createDTO.supporterCountryCodes().isEmpty()) {
+            Set<Country> countries = new HashSet<>();
+            for (String code : createDTO.supporterCountryCodes()) {
+                Country country = countryRepository.findByCode(code)
+                        .orElseThrow(() -> new NotFoundException
+("Country not found with code: " + code));
+                countries.add(country);
+            }
+            faction.setSupportingCountries(countries);
         }
 
-        return factionRepo.save(faction);
+        Faction saved = factionRepository.save(faction);
+        return toDTO(saved);
     }
 
-    public Faction update(Long id, Faction updated, List<String> supporterCodes) {
-        Faction existing = findById(id);
+    public FactionDTO updateFaction(Long id, FactionCreateDTO updateDTO) {
+        Faction faction = factionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException
+("Faction not found with id: " + id));
 
-        existing.setName(updated.getName());
+        Conflict conflict = conflictRepository.findById(updateDTO.conflictId())
+                .orElseThrow(() -> new NotFoundException
+("Conflict not found with id: " + updateDTO.conflictId()));
 
-        existing.getCountries().clear();
-        for (String code : supporterCodes) {
-            Country c = countryRepo.findByCode(code)
-                    .orElseThrow(() -> new NotFoundException("Country %s not found".formatted(code)));
-            existing.getCountries().add(c);
+        faction.setName(updateDTO.name());
+        faction.setConflict(conflict);
+
+        if (updateDTO.supporterCountryCodes() != null) {
+            Set<Country> countries = new HashSet<>();
+            for (String code : updateDTO.supporterCountryCodes()) {
+                Country country = countryRepository.findByCode(code)
+                        .orElseThrow(() -> new NotFoundException
+("Country not found with code: " + code));
+                countries.add(country);
+            }
+            faction.setSupportingCountries(countries);
         }
 
-        return existing;
+        Faction saved = factionRepository.save(faction);
+        return toDTO(saved);
     }
 
-    public void delete(Long id) {
-        factionRepo.deleteById(id);
+    public void deleteFaction(Long id) {
+        if (!factionRepository.existsById(id)) {
+            throw new NotFoundException
+("Faction not found with id: " + id);
+        }
+        factionRepository.deleteById(id);
+    }
+
+    private FactionDTO toDTO(Faction faction) {
+        Set<String> countryCodes = faction.getSupportingCountries().stream()
+                .map(Country::getCode)
+                .collect(Collectors.toSet());
+
+        return new FactionDTO(
+                faction.getId(),
+                faction.getName(),
+                faction.getConflict().getId(),
+                faction.getConflict().getName(),
+                countryCodes
+        );
     }
 }
