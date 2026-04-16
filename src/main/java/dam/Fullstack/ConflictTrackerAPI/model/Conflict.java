@@ -1,34 +1,32 @@
 package dam.Fullstack.ConflictTrackerAPI.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "conflicts")
 public class Conflict {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long        id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @Column(nullable = false)
-    private String      name;
+    private String name;
     @Column(name = "city_date")
-    private LocalDate   startDate;
-    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    private LocalDate startDate;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ConflictStatus status;
     @Column(name = "city_description")
-    private String      description;
+    private String description;
 
-    //relation many to many Country
     @ManyToMany
-    @JoinTable(name = "conflict_countries",
+    @JoinTable(
+            name = "conflict_countries",
             joinColumns = @JoinColumn(name = "conflict_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id")
-    ) private Set<Country> countries = new  HashSet<>();
+    )
+    private Set<Country> countries = new HashSet<>();
 
     @OneToMany(mappedBy = "conflict", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Faction> factions = new ArrayList<>();
@@ -36,8 +34,7 @@ public class Conflict {
     @OneToMany(mappedBy = "conflict", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events = new ArrayList<>();
 
-    public Conflict() {
-    }
+    public Conflict() {}
 
     public Conflict(String name, LocalDate startDate, ConflictStatus status, String description) {
         this.name = name;
@@ -46,7 +43,7 @@ public class Conflict {
         this.description = description;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -70,6 +67,14 @@ public class Conflict {
         return countries;
     }
 
+    public List<Faction> getFactions() {
+        return factions;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -88,13 +93,5 @@ public class Conflict {
 
     public void setCountries(Set<Country> countries) {
         this.countries = countries;
-    }
-
-    public List<Faction> getFactions() {
-        return factions;
-    }
-
-    public List<Event> getEvents() {
-        return events;
     }
 }

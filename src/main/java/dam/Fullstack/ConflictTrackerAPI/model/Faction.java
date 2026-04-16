@@ -1,7 +1,6 @@
 package dam.Fullstack.ConflictTrackerAPI.model;
 
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,9 +9,9 @@ import java.util.Set;
 public class Faction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long        id;
+    private Long id;
     @Column(nullable = false)
-    private String      name;
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "conflict_id")
@@ -26,8 +25,7 @@ public class Faction {
     )
     private Set<Country> supportingCountries = new HashSet<>();
 
-    public Faction() {
-    }
+    public Faction() {}
 
     public Faction(String name, Conflict conflict) {
         this.name = name;
@@ -38,28 +36,28 @@ public class Faction {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Conflict getConflict() {
         return conflict;
     }
 
-    public void setConflict(Conflict conflict) {
-        this.conflict = conflict;
-    }
-
     public Set<Country> getSupportingCountries() {
         return supportingCountries;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setConflict(Conflict conflict) {
+        this.conflict = conflict;
     }
 
     public void setSupportingCountries(Set<Country> supportingCountries) {

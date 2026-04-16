@@ -9,7 +9,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,7 +25,7 @@ public class EventService {
     public List<EventDTO> getAllEvents() {
         return eventRepository.findAll().stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public EventDTO getEventById(Long id) {
@@ -38,7 +37,7 @@ public class EventService {
     public List<EventDTO> getEventsByConflictId(Long conflictId) {
         return eventRepository.findByConflictIdOrderByEventDateDesc(conflictId).stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public EventDTO createEvent(EventCreateDTO createDTO) {

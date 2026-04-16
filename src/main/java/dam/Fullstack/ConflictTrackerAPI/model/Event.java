@@ -1,29 +1,26 @@
 package dam.Fullstack.ConflictTrackerAPI.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "events")
 public class Event {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long        id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @Column(nullable = false)
-    private LocalDate   eventDate;
+    private LocalDate eventDate;
     @Column(nullable = false)
-    private String      location;
+    private String location;
     @Column(nullable = false)
-    private String      description;
+    private String description;
 
-    //relation many to one Conflict
     @ManyToOne(optional = false)
     @JoinColumn(name = "conflict_id")
     private Conflict conflict;
 
-    public Event() {
-    }
+    public Event() {}
 
     public Event(LocalDate eventDate, String location, String description, Conflict conflict) {
         this.eventDate = eventDate;
@@ -32,7 +29,7 @@ public class Event {
         this.conflict = conflict;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
