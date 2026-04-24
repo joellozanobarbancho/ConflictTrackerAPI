@@ -56,4 +56,20 @@ public class EventController {
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/range")
+    public ResponseEntity<List<EventDTO>> getEventsByDateRange(
+            @RequestParam String start,
+            @RequestParam String end) {
+        return ResponseEntity.ok(
+                eventService.getEventsByDateRange(start, end)
+        );
+    }
+
+    @GetMapping("/location/{text}")
+    public ResponseEntity<List<EventDTO>> getEventsByLocation(
+            @PathVariable String text) {
+        return ResponseEntity.ok(eventService.getEventsByLocation(text));
+    }
+
 }

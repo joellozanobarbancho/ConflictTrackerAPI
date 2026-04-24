@@ -102,6 +102,7 @@ public class FactionService {
     }
 
     private FactionDTO toDTO(Faction faction) {
+
         Set<String> countryCodes =
                 faction.getSupportingCountries() == null
                         ? Set.of()
@@ -109,11 +110,17 @@ public class FactionService {
                         .map(Country::getCode)
                         .collect(java.util.stream.Collectors.toSet());
 
+        Long conflictId =
+                faction.getConflict() == null ? null : faction.getConflict().getId();
+
+        String conflictName =
+                faction.getConflict() == null ? null : faction.getConflict().getName();
+
         return new FactionDTO(
                 faction.getId(),
                 faction.getName(),
-                faction.getConflict().getId(),
-                faction.getConflict().getName(),
+                conflictId,
+                conflictName,
                 countryCodes
         );
     }

@@ -78,13 +78,33 @@ public class EventService {
     }
 
     private EventDTO toDTO(Event event) {
+
+        Long conflictId =
+                event.getConflict() == null ? null : event.getConflict().getId();
+
+        String conflictName =
+                event.getConflict() == null ? null : event.getConflict().getName();
+
         return new EventDTO(
                 event.getId(),
                 event.getEventDate(),
                 event.getLocation(),
                 event.getDescription(),
-                event.getConflict().getId(),
-                event.getConflict().getName()
+                conflictId,
+                conflictName
         );
     }
+
+    public List<EventDTO> getEventsByDateRange(String start, String end) {
+        return eventRepository.findByEventDateBetween(
+                java.time.LocalDate.parse(start),
+                java.time.LocalDate.parse(end)
+        ).stream().map(this::toDTO).toList();
+    }
+
+    public List<EventDTO> getEventsByLocation(String text) {
+        return eventRepository.findByLocationContainingIgnoreCase(text)
+                .stream().map(this::toDTO).toList();
+    }
+
 }

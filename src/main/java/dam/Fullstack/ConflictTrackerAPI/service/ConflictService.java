@@ -1,17 +1,20 @@
 package dam.Fullstack.ConflictTrackerAPI.service;
 
 import dam.Fullstack.ConflictTrackerAPI.dto.conflict.*;
-import dam.Fullstack.ConflictTrackerAPI.dto.event.*;
-import dam.Fullstack.ConflictTrackerAPI.dto.faction.*;
-import dam.Fullstack.ConflictTrackerAPI.dto.country.*;
-import dam.Fullstack.ConflictTrackerAPI.model.*;
-import dam.Fullstack.ConflictTrackerAPI.repository.*;
+import dam.Fullstack.ConflictTrackerAPI.dto.country.CountryDTO;
+import dam.Fullstack.ConflictTrackerAPI.dto.event.EventDTO;
+import dam.Fullstack.ConflictTrackerAPI.dto.faction.FactionDTO;
+import dam.Fullstack.ConflictTrackerAPI.model.Conflict;
+import dam.Fullstack.ConflictTrackerAPI.model.ConflictStatus;
+import dam.Fullstack.ConflictTrackerAPI.model.Country;
+import dam.Fullstack.ConflictTrackerAPI.model.Faction;
+import dam.Fullstack.ConflictTrackerAPI.model.Event;
+import dam.Fullstack.ConflictTrackerAPI.repository.ConflictRepository;
+import dam.Fullstack.ConflictTrackerAPI.repository.CountryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,7 +102,9 @@ public class ConflictService {
 
     private ConflictDTO toDTO(Conflict conflict) {
         Set<String> countryCodes =
-                safeSet(conflict.getCountries()).stream()
+                conflict.getCountries() == null
+                        ? Set.of()
+                        : conflict.getCountries().stream()
                         .map(Country::getCode)
                         .collect(Collectors.toSet());
 
@@ -114,26 +119,35 @@ public class ConflictService {
     }
 
     private ConflictDetailDTO toDetailDTO(Conflict conflict) {
+
         Set<CountryDTO> countries =
-                safeSet(conflict.getCountries()).stream()
+                conflict.getCountries() == null
+                        ? Set.of()
+                        : conflict.getCountries().stream()
                         .map(c -> new CountryDTO(c.getId(), c.getName(), c.getCode()))
                         .collect(Collectors.toSet());
 
         List<FactionDTO> factions =
-                safeList(conflict.getFactions()).stream()
+                conflict.getFactions() == null
+                        ? List.of()
+                        : conflict.getFactions().stream()
                         .map(f -> new FactionDTO(
                                 f.getId(),
                                 f.getName(),
                                 conflict.getId(),
                                 conflict.getName(),
-                                safeSet(f.getSupportingCountries()).stream()
+                                f.getSupportingCountries() == null
+                                        ? Set.of()
+                                        : f.getSupportingCountries().stream()
                                         .map(Country::getCode)
                                         .collect(Collectors.toSet())
                         ))
                         .toList();
 
         List<EventDTO> events =
-                safeList(conflict.getEvents()).stream()
+                conflict.getEvents() == null
+                        ? List.of()
+                        : conflict.getEvents().stream()
                         .map(e -> new EventDTO(
                                 e.getId(),
                                 e.getEventDate(),
@@ -156,11 +170,11 @@ public class ConflictService {
         );
     }
 
-    private <T> Set<T> safeSet(Set<T> set) {
-        return set == null ? Set.of() : set;
+    public List<ConflictDTO> searchByName(String name) {
+        return conflictRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(this::toDTO)
+                .toList();
     }
 
-    private <T> List<T> safeList(List<T> list) {
-        return list == null ? List.of() : list;
-    }
+
 }

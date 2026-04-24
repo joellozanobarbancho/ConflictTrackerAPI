@@ -56,4 +56,17 @@ public class ConflictController {
         conflictService.deleteConflict(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ConflictDTO>> searchConflictsByName(
+            @RequestParam String name) {
+        return ResponseEntity.ok(conflictService.searchByName(name));
+    }
+
+    @GetMapping("/by-country/{code}")
+    public ResponseEntity<List<ConflictDTO>> getConflictsByCountry(
+            @PathVariable String code) {
+        return ResponseEntity.ok(conflictService.getConflictsByCountryCode(code));
+    }
+
 }
