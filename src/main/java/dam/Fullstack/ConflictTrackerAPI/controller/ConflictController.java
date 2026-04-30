@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/conflicts")
-@CrossOrigin(origins = "*")
 public class ConflictController {
 
     private final ConflictService conflictService;
